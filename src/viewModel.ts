@@ -1,13 +1,13 @@
 import { useState, useSyncExternalStore } from 'react';
 import { cropForRatio, makeVariant, moveCrop, resizeCrop } from './domain';
 import { EMPTY_DOCUMENT, type FrameDocument, type GuideKey, type Ratio, type ViewState } from './model';
-import type { FrameRepository } from './repository';
+import type { FrameRepository, StorageInfo } from './repository';
 import type { ImageService } from './service';
 
 type Listener = () => void;
 
 export class FrameSenseViewModel {
-  private state: ViewState = { phase: 'loading', document: structuredClone(EMPTY_DOCUMENT), compareOpen: false, notice: '', error: null };
+  private state: ViewState = { phase: 'loading', document: structuredClone(EMPTY_DOCUMENT), compareOpen: false, notice: '', error: null, storageInfo: null, storageDialogOpen: false };
   private readonly listeners = new Set<Listener>();
 
   constructor(private readonly repository: FrameRepository, private readonly imageService: ImageService) {}
@@ -24,20 +24,46 @@ export class FrameSenseViewModel {
     this.listeners.forEach((listener) => listener());
   }
 
-  private persist(document: FrameDocument, notice: string): void {
-    this.patch({ document, phase: 'editing', notice, error: null });
+  private refreshStorageInfo(): void {
     try {
-      this.repository.save(document);
+      const storageInfo: StorageInfo = this.repository.getStorageInfo();
+      this.patch({ storageInfo });
     } catch {
-      this.patch({ phase: 'error', error: '本地保存失败，但当前编辑仍保留在页面中。请检查浏览器存储权限。' });
+      // Storage info is advisory; never block editing on it.
     }
+  }
+
+  private persist(document: FrameDocument, notice: string): void {
+    const result = this.repository.save(document);
+    if (!result.ok) {
+      this.patch({ document, phase: 'error', error: result.error ?? '本地保存失败，但当前编辑仍保留在页面中。请检查浏览器存储权限。' });
+      return;
+    }
+    const next: FrameDocument = result.imagePersisted ? document : { ...document, imageMissing: true };
+    const fullNotice = result.imagePersisted
+      ? notice
+      : `${notice} 图片数据因浏览器容量限制未能保存，构图方案已保留；下次打开需重新选择原图。`;
+    this.patch({ document: next, phase: 'editing', notice: fullNotice, error: null });
+    this.refreshStorageInfo();
   }
 
   async initialize(): Promise<void> {
     this.patch({ phase: 'loading', notice: '正在恢复上次工作状态…', error: null });
     try {
       const document = this.repository.load();
-      this.patch({ document, phase: document.image ? 'editing' : 'ready', notice: document.image ? '已恢复上次工作状态' : '欢迎来到 FrameSense，先载入示例或导入图片。' });
+      const storageInfo = this.repository.getStorageInfo();
+      if (document.imageMissing) {
+        this.patch({
+          document,
+          phase: 'ready',
+          storageInfo,
+          notice: `已恢复 ${document.variants.length} 个构图方案；图片数据未保存到本地，请重新选择原图。`,
+        });
+      } else if (document.image) {
+        this.patch({ document, phase: 'editing', storageInfo, notice: '已恢复上次工作状态。' });
+      } else {
+        this.patch({ document, phase: 'ready', storageInfo, notice: '欢迎来到 FrameSense，先载入示例或导入图片。' });
+      }
     } catch {
       this.patch({ phase: 'error', notice: '未能读取历史状态，可继续新建工作。', error: '本地数据读取失败。' });
     }
@@ -47,15 +73,27 @@ export class FrameSenseViewModel {
     this.patch({ phase: 'loading', notice: '正在载入图片…', error: null });
     try {
       const image = await this.imageService.readFile(file);
-      const document: FrameDocument = { ...structuredClone(EMPTY_DOCUMENT), image };
-      this.persist(document, '图片已载入，可以开始构图。');
+      const document: FrameDocument = {
+        ...this.state.document,
+        image,
+        imageMeta: { name: image.name, width: image.width, height: image.height },
+        imageMissing: false,
+      };
+      this.persist(document, '图片已载入，构图方案已保留。');
     } catch (error) {
       this.patch({ phase: 'error', error: error instanceof Error ? error.message : '图片载入失败。' });
     }
   }
 
   loadDemo(): void {
-    this.persist({ ...structuredClone(EMPTY_DOCUMENT), image: this.imageService.demo() }, '示例图片已载入。');
+    const image = this.imageService.demo();
+    const document: FrameDocument = {
+      ...this.state.document,
+      image,
+      imageMeta: { name: image.name, width: image.width, height: image.height },
+      imageMissing: false,
+    };
+    this.persist(document, '示例图片已载入。');
   }
 
   toggleGuide(guide: GuideKey): void {
@@ -97,6 +135,28 @@ export class FrameSenseViewModel {
 
   toggleCompare(): void {
     this.patch({ compareOpen: !this.state.compareOpen });
+  }
+
+  openStorageDialog(): void {
+    this.refreshStorageInfo();
+    this.patch({ storageDialogOpen: true });
+  }
+
+  closeStorageDialog(): void {
+    this.patch({ storageDialogOpen: false });
+  }
+
+  clearImageData(): void {
+    this.repository.clearImage();
+    const document: FrameDocument = { ...this.state.document, image: null, imageMissing: true };
+    this.patch({ document, phase: 'ready', notice: '图片数据已清除，构图方案保留；重新选择图片即可恢复工作台。', error: null });
+    this.refreshStorageInfo();
+  }
+
+  clearAllData(): void {
+    this.repository.clearAll();
+    this.patch({ document: structuredClone(EMPTY_DOCUMENT), phase: 'ready', compareOpen: false, notice: '本地数据已全部清除。', error: null, storageDialogOpen: false });
+    this.refreshStorageInfo();
   }
 }
 

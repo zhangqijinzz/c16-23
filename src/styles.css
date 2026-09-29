@@ -19,3 +19,57 @@ button { cursor: pointer; }
 .variants-panel { padding: 31px 19px; border-left: 1px solid #ded8ca; background: #f1ece3aa; }.panel-heading { display: flex; justify-content: space-between; align-items: end; margin-bottom: 24px; }.panel-heading h3 { margin: 0; font-size: 18px; letter-spacing: -.05em; }.panel-heading h3 span { color: #b75e3d; font: 11px 'DM Mono'; margin-left: 4px; }.panel-heading .eyebrow { margin-bottom: 7px; }.save-button { padding: 8px 10px; font-size: 10px; }.variant-empty { border: 1px dashed #cfc7b8; padding: 21px 10px; text-align: center; color: #958d80; }.variant-empty > span { font-size: 24px; color: #c08a70; }.variant-empty p { margin: 8px 0 4px; font-size: 11px; }.variant-empty small { font-size: 10px; line-height: 1.5; }.variant-list { display: grid; gap: 9px; }.variant-card { display: grid; grid-template-columns: 55px 1fr 14px; gap: 10px; align-items: center; border: 1px solid #d9d1c3; background: #f8f4ec; padding: 7px; text-align: left; color: #514d45; }.variant-card.selected { border-color: #bd7658; box-shadow: inset 3px 0 #b75e3d; }.variant-thumb { width: 55px; height: 43px; overflow: hidden; background: #27342f; }.variant-thumb img { width: 100%; height: 100%; object-fit: cover; }.variant-card strong, .variant-card small { display: block; }.variant-card strong { font-size: 11px; }.variant-card small { color: #989082; font: 9px 'DM Mono', monospace; margin-top: 5px; }.variant-card em { color: #b75e3d; font-style: normal; }.variant-tip { display: flex; gap: 8px; padding: 14px 0; border-top: 1px solid #dad2c4; margin-top: 26px; color: #938b7e; font-size: 10px; line-height: 1.5; }.variant-tip span { color: #bd7658; }.variant-tip p { margin: 0; }
 .comparison { min-height: 570px; }.compare-intro { padding: 27px 0 22px; }.compare-intro h2 { margin: 0 0 8px; font-size: 28px; letter-spacing: -.06em; }.compare-intro > p:last-child { color: #8e8679; font-size: 12px; }.comparison-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }.comparison-grid article { background: #eae4d9; padding: 10px; }.compare-image { height: 240px; position: relative; overflow: hidden; background: #25332f; }.compare-image img { width: 100%; height: 100%; object-fit: cover; }.compare-image span { position: absolute; left: 10px; top: 10px; padding: 4px 6px; background: #1c211ed9; color: #fff9e8; font: 10px 'DM Mono'; }.comparison-grid article > div:last-child { padding: 10px 2px 2px; }.comparison-grid strong, .comparison-grid small { display: block; }.comparison-grid strong { font-size: 12px; }.comparison-grid small { color: #948c80; font: 10px 'DM Mono'; margin-top: 4px; }.compare-empty { padding: 80px 0; border: 1px dashed #cfc7b8; text-align: center; color: #958d80; font-size: 12px; }.footer { display: flex; justify-content: space-between; padding: 15px 38px; border-top: 1px solid #ded8ca; color: #a19a8e; font: 10px 'DM Mono', monospace; }
 @media (max-width: 1100px) { body { min-width: 900px; }.workspace { grid-template-columns: 190px minmax(480px, 1fr) 230px; }.toolbar { padding-left: 14px; padding-right: 14px; }.variants-panel { padding-left: 13px; padding-right: 13px; }.work-area { padding-left: 28px; padding-right: 28px; } }
+
+/* ---- storage footer button ---- */
+.storage-footer-button { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #d7d0c2; background: #f8f4ec; border-radius: 20px; padding: 4px 12px 4px 6px; color: #8d877b; font: 10px 'DM Mono', monospace; cursor: pointer; }
+.storage-footer-button:hover { border-color: #b75e3d; color: #b75e3d; }
+.storage-footer-bar { width: 56px; height: 6px; background: #e4ddce; border-radius: 3px; overflow: hidden; }
+.storage-footer-bar i { display: block; height: 100%; background: #66866b; }
+.storage-footer-bar i.warn { background: #d99a4e; }
+.storage-footer-bar i.danger { background: #c25c4f; }
+
+/* ---- missing image panel ---- */
+.missing-panel { min-height: 570px; border: 1px dashed #d8b29e; background: #fbf3ea; display: flex; align-items: center; flex-direction: column; justify-content: center; text-align: center; border-radius: 5px; padding: 40px; }
+.missing-panel h2 { margin: 8px 0; font-size: 25px; letter-spacing: -.06em; }
+.missing-panel > p:not(.eyebrow) { max-width: 460px; color: #8a8275; font-size: 13px; line-height: 1.7; }
+.missing-orbit { width: 78px; height: 78px; border: 1px solid #d8b29e; border-radius: 50%; position: relative; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: #b75e3d; font-size: 30px; }
+.missing-actions { display: flex; gap: 10px; margin-top: 22px; }
+.missing-actions .primary-button { display: inline-block; cursor: pointer; }
+.missing-actions .primary-button input { display: none; }
+.missing-actions .quiet-button { border: 0; border-radius: 4px; padding: 12px 18px; font-size: 12px; font-weight: 700; background: #e7e1d5; color: #655f55; cursor: pointer; }
+.missing-storage-link { margin-top: 22px; border: 0; background: transparent; color: #b75e3d; font-size: 11px; text-decoration: underline; cursor: pointer; }
+
+/* ---- storage dialog ---- */
+.storage-overlay { position: fixed; inset: 0; background: #2a252066; display: flex; align-items: center; justify-content: center; z-index: 50; }
+.storage-dialog { width: 460px; max-width: calc(100vw - 40px); background: #fffaf0; border: 1px solid #d7d0c2; border-radius: 8px; box-shadow: 0 24px 60px #3a302040; padding: 24px; }
+.storage-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+.storage-header h2 { margin: 2px 0 0; font-size: 20px; letter-spacing: -.04em; }
+.storage-close { border: 0; background: transparent; font-size: 22px; color: #9b9488; cursor: pointer; line-height: 1; }
+.storage-usage { margin-bottom: 18px; }
+.storage-bar { height: 10px; background: #e9e2d4; border-radius: 5px; overflow: hidden; }
+.storage-bar span { display: block; height: 100%; background: #66866b; transition: width .2s; }
+.storage-bar span.warn { background: #d99a4e; }
+.storage-bar span.danger { background: #c25c4f; }
+.storage-usage-label { display: flex; justify-content: space-between; margin-top: 7px; color: #8d877b; font: 10px 'DM Mono', monospace; }
+.storage-breakdown { list-style: none; margin: 0 0 14px; padding: 0; border: 1px solid #e2dacb; border-radius: 6px; overflow: hidden; }
+.storage-breakdown li { display: grid; grid-template-columns: 10px 1fr auto; grid-template-rows: auto auto; gap: 2px 10px; padding: 11px 14px; align-items: center; }
+.storage-breakdown li + li { border-top: 1px solid #e2dacb; }
+.storage-breakdown .dot { width: 8px; height: 8px; border-radius: 50%; grid-row: 1 / 3; }
+.storage-breakdown .dot.composition { background: #b75e3d; }
+.storage-breakdown .dot.image { background: #66866b; }
+.storage-breakdown b { font: 12px 'DM Mono', monospace; color: #5c574f; text-align: right; }
+.storage-breakdown small { grid-column: 2 / 4; color: #a29a8c; font-size: 10px; }
+.storage-note { font-size: 11px; line-height: 1.6; color: #8d877b; background: #f4eee2; border-radius: 5px; padding: 10px 12px; margin: 0 0 16px; }
+.storage-actions { display: grid; gap: 10px; }
+.storage-action { border: 1px solid #d7d0c2; background: #f8f4ec; border-radius: 6px; padding: 12px 14px; text-align: left; cursor: pointer; color: #514d45; }
+.storage-action:hover:not(:disabled) { border-color: #b75e3d; }
+.storage-action:disabled { opacity: .45; cursor: not-allowed; }
+.storage-action strong { display: block; font-size: 12px; }
+.storage-action small { display: block; margin-top: 3px; font-size: 10px; color: #989082; line-height: 1.5; }
+.storage-action.danger-ghost:hover:not(:disabled) { border-color: #c25c4f; }
+.storage-confirm { border: 1px solid #e0b8b0; background: #fbf0ed; border-radius: 6px; padding: 12px 14px; }
+.storage-confirm p { margin: 0 0 10px; font-size: 11px; line-height: 1.6; color: #8a5a50; }
+.storage-confirm-row { display: flex; gap: 8px; justify-content: flex-end; }
+.storage-confirm-row button { border: 0; border-radius: 4px; padding: 7px 12px; font-size: 11px; font-weight: 700; cursor: pointer; background: #e7e1d5; color: #655f55; }
+.storage-confirm-row button.danger { background: #c25c4f; color: #fffaf1; }
+.thumb-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #2c332e; color: #c9b8a8; font: 9px 'DM Mono', monospace; }

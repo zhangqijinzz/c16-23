@@ -1,4 +1,4 @@
-import type { CropVariant, FrameDocument, Ratio } from './model';
+import type { CropVariant, FrameDocument, ImageAsset, ImageMeta, Ratio } from './model';
 
 const clamp = (value: number, min = 0, max = 1): number => Math.min(max, Math.max(min, value));
 
@@ -50,8 +50,25 @@ export function makeVariant(crop: CropVariant, id: string): CropVariant {
   return { ...normalizeCrop(crop), id };
 }
 
+export function isImageMeta(value: unknown): value is ImageMeta {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<ImageMeta>;
+  return typeof candidate.name === 'string' && typeof candidate.width === 'number' && typeof candidate.height === 'number';
+}
+
+export function isImageAsset(value: unknown): value is ImageAsset {
+  if (!isImageMeta(value)) return false;
+  const candidate = value as Partial<ImageAsset>;
+  return typeof candidate.src === 'string' && candidate.src.length > 0;
+}
+
 export function isFrameDocument(value: unknown): value is FrameDocument {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as Partial<FrameDocument>;
-  return candidate.version === 1 && typeof candidate.guides === 'object' && candidate.crop !== undefined && Array.isArray(candidate.variants);
+  if (candidate.version !== 1) return false;
+  if (typeof candidate.guides !== 'object' || candidate.guides === null) return false;
+  if (typeof candidate.crop !== 'object' || candidate.crop === null) return false;
+  if (!Array.isArray(candidate.variants)) return false;
+  if (candidate.imageMeta !== null && candidate.imageMeta !== undefined && !isImageMeta(candidate.imageMeta)) return false;
+  return true;
 }

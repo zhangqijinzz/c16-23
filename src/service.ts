@@ -1,19 +1,30 @@
 import type { ImageAsset } from './model';
 
-export const STORAGE_KEY = 'framesense.document.v1';
+export const STORAGE_KEY_DOCUMENT = 'framesense.document.v1';
+export const STORAGE_KEY_IMAGE = 'framesense.image.v1';
 
 export interface StorageService {
-  read(): string | null;
-  write(value: string): void;
+  read(key: string): string | null;
+  write(key: string, value: string): void;
+  remove(key: string): void;
+  keys(): string[];
 }
 
 export class BrowserStorageService implements StorageService {
-  read(): string | null {
-    return window.localStorage.getItem(STORAGE_KEY);
+  read(key: string): string | null {
+    return window.localStorage.getItem(key);
   }
 
-  write(value: string): void {
-    window.localStorage.setItem(STORAGE_KEY, value);
+  write(key: string, value: string): void {
+    window.localStorage.setItem(key, value);
+  }
+
+  remove(key: string): void {
+    window.localStorage.removeItem(key);
+  }
+
+  keys(): string[] {
+    return Object.keys(window.localStorage);
   }
 }
 
